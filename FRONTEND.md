@@ -11,3 +11,7 @@ Hosting: `firebase.json` → `public: "web"` (folder `web/src` hanya referensi d
 6. Admin: Peserta & regu → impor CSV → bagikan kredensial awal. Penguji dibuat lewat Admin SDK (claims `role:'penguji', team, canUnlock`).
 Berkas lokal (content://, file://): jalankan `python3 build-satu-berkas.py` → `index-satu-berkas.html` (hanya Beranda & Materi; login/ujian wajib lewat https).
 Uji lokal: `USE_EMULATORS = true` di firebase-config.js, `firebase emulators:start`, buka `localhost`.
+
+
+## GitHub Pages
+`index.html` di root dihasilkan oleh `python3 build-satu-berkas.py` dari `web/` (jangan edit langsung). Tambahkan `hizbulwathansmpmusago-bit.github.io` ke Firebase Auth → Authorized domains. Semua panggilan backend memakai `httpsCallable` dengan `FUNCTIONS_REGION` dari `web/firebase-config.js`.

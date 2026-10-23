@@ -1,6 +1,12 @@
 {
-  "name": "skt-functions", "private": true, "main": "lib/index.js", "engines": { "node": "20" },
-  "scripts": { "build": "tsc -p .", "test": "tsx --test test/morse.test.ts test/attempts.test.ts test/roster.test.ts test/authz.test.ts test/bootstrap.test.ts test/config.test.ts" },
-  "dependencies": { "firebase-admin": "^12.0.0", "firebase-functions": "^5.0.0" },
-  "devDependencies": { "typescript": "^5.4.0", "tsx": "^4.0.0", "@types/node": "^20.0.0" }
+  "name": "skt-madya-sandi-morse",
+  "private": true,
+  "description": "SKT Madya Sandi Morse HW Musago — frontend (web/), backend Cloud Functions (functions/)",
+  "scripts": {
+    "build:single": "python3 build-satu-berkas.py",
+    "test": "npm --prefix functions test",
+    "test:e2e": "node tests/e2e/login.e2e.mjs",
+    "check:functions": "node scripts/check-functions.mjs"
+  },
+  "devDependencies": { "playwright": "^1.48.0" }
 }

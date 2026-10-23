@@ -1,11 +1,13 @@
 # SKT Madya — Sandi Morse HW Musago
 
-## Status jujur (per perbaikan login)
-Lihat `SETUP-AUTH.md` (panduan) dan `CHANGES.md` (perubahan).
-- **Teruji:** 34 tes unit (Morse, penilaian, percobaan/penguncian/audit, otorisasi akun, roster/CSV, bootstrap admin, pembuat konfigurasi) dan 68 pemeriksaan UI di Chromium (login, galat, sesi, hak akses, akun, responsif 375px) memakai **SDK Firebase tiruan**.
-- **Belum diuji:** Firebase Auth/Firestore/Functions sungguhan, `functions/src/index.ts` (belum dikompilasi), `firestore.rules` (butuh Emulator), email atur password sungguhan, deployment.
-- **Perlu tindakan pemilik akun:** proyek Firebase + Blaze, aktifkan Email/Password, isi `web/firebase-config.js`, deploy, bootstrap admin pertama.
-- **Belum ada:** antarmuka kelola bank soal; roster DP8/DP9 asli (tidak ada di sesi ini, tidak dikarang).
+## Struktur
+`web/` frontend (Firebase Hosting; sumber) · `index.html` root = hasil bangun satu berkas untuk GitHub Pages · `functions/` backend (Cloud Functions v2, Node 20, TypeScript, region asia-southeast2) · `firestore.rules` · `scripts/` · `tests/e2e/` · `seed/`.
+Panduan: `DEPLOY.md` (migrasi struktur, Pages, deploy, diagnosa CORS) dan `SETUP-AUTH.md` (admin pertama, akun). Perubahan: `CHANGES.md`.
+
+## Status jujur
+- **Dijalankan:** 36 tes unit + 77 pemeriksaan UI (Chromium, Firebase tiruan).
+- **Belum diverifikasi:** `npm install`/`tsc` penuh `index.ts`, Emulator (Rules/Functions), deploy, login produksi. CI (`.github/workflows/ci.yml`) menjalankan build+tes di GitHub — periksa tab Actions.
+- Bank soal belum punya antarmuka (isi via Console / fungsi `adminSaveQuestion`). Roster DP8/DP9 asli tidak ada di repo (tidak dikarang).
 - `seed/prototipe-lama.html` = prototipe lama (demo, jangan dipakai ujian resmi).
 
 ## Menjalankan tes inti

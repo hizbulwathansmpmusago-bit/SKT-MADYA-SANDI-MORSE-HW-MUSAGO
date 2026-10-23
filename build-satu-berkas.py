@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Gabungkan web/index.html + style.css + script.js + firebase-config.js menjadi SATU berkas
-(index-satu-berkas.html) yang bisa dibuka langsung dari HP/file manager (content://, file://)."""
+(index.html + salinan index-satu-berkas.html) yang bisa dibuka langsung dari HP/file manager (content://, file://)."""
 import re, pathlib
 w = pathlib.Path(__file__).parent / 'web'
 html = (w/'index.html').read_text(); css = (w/'style.css').read_text(); js = (w/'script.js').read_text(); cfg = (w/'firebase-config.js').read_text()
@@ -12,4 +12,7 @@ html = html.replace('<script type="module" src="script.js"></script>', '<script 
 import base64
 uri = 'data:image/png;base64,' + base64.b64encode((w/'logo.png').read_bytes()).decode()
 html = html.replace('"logo.png"', '"' + uri + '"')
-out = pathlib.Path(__file__).parent / 'index-satu-berkas.html'; out.write_text(html); print('OK', out, len(html), 'bytes')
+root = pathlib.Path(__file__).parent
+# index.html di root = untuk GitHub Pages (Deploy from branch: main / root). Sumber kebenaran tetap web/. Jangan edit file hasil ini.
+for name in ('index.html', 'index-satu-berkas.html'):
+    (root / name).write_text(html); print('OK', root / name, len(html), 'bytes')

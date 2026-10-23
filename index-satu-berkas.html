@@ -271,16 +271,20 @@ input[aria-invalid=true]{border-color:var(--red)}
 // Backend yang dipakai (functions/src/index.ts): startAttempt, getQuestions, saveAnswer, reportVisibilityLoss,
 // submitAttempt, getResult, setManualScore, unlockAttempt, whoami, adminCreateAccount, adminSetRole, adminSetDisabled, adminResetLink,
 // adminImportRoster, adminExportCsv, adminSetConfig, adminEndExam.
-// Konfigurasi web Firebase — nilai ini PUBLIK (bukan rahasia). Keamanan ada di Firestore Rules + Cloud Functions.
-// Isi dari: Firebase Console → Project settings → Your apps → Web app → SDK config.
+// Konfigurasi Firebase SKT Madya Sandi Morse HW Musago
+// Nilai web-config ini PUBLIK (bukan rahasia). Keamanan ada di Firestore Rules + Cloud Functions.
 const firebaseConfig = {
-  apiKey: 'ISI_API_KEY',
-  authDomain: 'ISI_PROJECT_ID.firebaseapp.com',
-  projectId: 'ISI_PROJECT_ID',
-  appId: 'ISI_APP_ID',
+  apiKey: "AIzaSyAVfkxU1HDhOmR_akYDgu_fX24_I6aHweg",
+  authDomain: "sktmadya-sandi-morse-hw-musago.firebaseapp.com",
+  projectId: "sktmadya-sandi-morse-hw-musago",
+  storageBucket: "sktmadya-sandi-morse-hw-musago.firebasestorage.app",
+  messagingSenderId: "807098321609",
+  appId: "1:807098321609:web:42e185acc91572c63e9b18",
+  measurementId: "G-EFT11XFM5V"
 };
-const FUNCTIONS_REGION = 'asia-southeast2'; // harus sama dengan web/src/lib/api.ts
-const USE_EMULATORS = false;                // true hanya saat uji lokal di localhost dengan Firebase Emulator
+// HARUS sama dengan setGlobalOptions({ region }) di functions/src/index.ts
+const FUNCTIONS_REGION = "asia-southeast2";
+const USE_EMULATORS = false;
 
 
 const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-';
@@ -311,7 +315,12 @@ async function initFirebase() {
 async function call(name, data) {
   if (!fb) throw Object.assign(new Error('Layanan belum siap'), { code: 'unavailable' });
   try { return (await fb.Fn.httpsCallable(fb.fns, name)(data)).data; }
-  catch (e) { if (String(e.code).endsWith('unauthenticated')) sessionExpired(); throw e; }
+  catch (e) {
+    if (String(e.code).endsWith('unauthenticated')) sessionExpired();
+    // 'internal' tanpa respons server biasanya = error CORS di console: fungsi belum di-deploy di region ini, ditolak IAM, atau crash saat start.
+    if (String(e.code).endsWith('internal')) console.error(`[backend] Panggilan fungsi "${name}" gagal tanpa respons server (region ${FUNCTIONS_REGION}). Jalankan: node scripts/check-functions.mjs — lihat DEPLOY.md`, e);
+    throw e;
+  }
 }
 const fget = async p => { const s = await fb.F.getDoc(fb.F.doc(fb.db, p)); return s.exists() ? s.data() : null; };
 const fq = async (col, ...c) => (await fb.F.getDocs(fb.F.query(fb.F.collection(fb.db, col), ...c))).docs.map(d => ({ id: d.id, ...d.data() }));
@@ -321,7 +330,7 @@ function errMsg(e) {
   const c = String(e?.code || '').replace(/^(functions|auth|firestore)\//, '');
   const net = 'Koneksi gagal. Periksa internet lalu coba lagi.';
   const M = { unauthenticated: 'Sesi login berakhir. Silakan masuk lagi.', 'permission-denied': 'Akses ditolak: akun ini tidak berhak melakukan tindakan tersebut.', unavailable: net, 'network-request-failed': net,
-    'deadline-exceeded': 'Server terlalu lama merespons. Coba lagi.', internal: 'Terjadi kesalahan di server. Coba lagi atau hubungi panitia.', 'invalid-credential': 'Email atau password salah.', 'wrong-password': 'Email atau password salah.',
+    'deadline-exceeded': 'Server terlalu lama merespons. Coba lagi.', internal: 'Server backend tidak dapat dihubungi atau mengalami kesalahan. Coba lagi; bila berulang, hubungi admin sistem (fungsi Cloud Functions mungkin belum di-deploy di region asia-southeast2).', 'invalid-credential': 'Email atau password salah.', 'wrong-password': 'Email atau password salah.',
     'user-not-found': 'Email atau password salah.', 'invalid-login-credentials': 'Email atau password salah.', 'too-many-requests': 'Terlalu banyak percobaan. Tunggu beberapa menit.', 'user-disabled': 'Akun dinonaktifkan. Hubungi panitia.',
     'requires-recent-login': 'Demi keamanan, keluar lalu masuk lagi sebelum mengganti password.', 'weak-password': 'Password terlalu lemah (minimal 6 karakter).', 'invalid-email': 'Format email tidak valid.',
     'invalid-api-key': 'Konfigurasi Firebase salah (API key tidak valid). Hubungi admin sistem.', 'api-key-not-valid.-please-pass-a-valid-api-key.': 'Konfigurasi Firebase salah (API key tidak valid). Hubungi admin sistem.',

@@ -15,6 +15,7 @@
   const lookupFn = (name, data) => {
     const S = st(), ses = session(); if (down()) throw E('functions/unavailable', 'offline');
     if (S.fnMissing === name) throw E('functions/not-found', 'not found');
+    if (S.fnInternal === name) throw E('functions/internal', 'internal');
     if (!ses) throw E('functions/unauthenticated', 'Login diperlukan');
     const u = S.users[ses.uid]; if (!u) throw E('functions/unauthenticated', 'Akun tidak ditemukan');
     if (u.disabled) throw E('functions/permission-denied', 'Akun dinonaktifkan. Hubungi panitia.');

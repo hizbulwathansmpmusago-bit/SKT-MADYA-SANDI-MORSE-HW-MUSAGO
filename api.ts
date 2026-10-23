@@ -1,13 +1,12 @@
-// Klien tipis untuk Cloud Functions. Semua keputusan (timer, kunci, nilai) ada di server.
+// Klien referensi bertipe untuk Cloud Functions. Aplikasi produksi memakai web/script.js (fungsi call()).
+// SEMUA panggilan memakai httpsCallable dengan region dari firebase-config.js (asia-southeast2) — bukan fetch langsung ke endpoint.
 import { initializeApp } from 'firebase/app';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-const app = initializeApp({
-  apiKey: import.meta.env.VITE_FB_API_KEY, authDomain: import.meta.env.VITE_FB_AUTH_DOMAIN, projectId: import.meta.env.VITE_FB_PROJECT_ID,
-  appId: import.meta.env.VITE_FB_APP_ID,
-}); // nilai publik konfigurasi web Firebase, BUKAN rahasia; keamanan ada di Rules + Functions
-const fn = getFunctions(app, 'asia-southeast2');
-const call = <I, O>(name: string) => (data?: I) => httpsCallable<I, O>(fn, name)(data).then(r => r.data);
+import { firebaseConfig, FUNCTIONS_REGION } from '../../firebase-config.js';
+const fns = getFunctions(initializeApp(firebaseConfig), FUNCTIONS_REGION);
+const call = <I, O>(name: string) => (data?: I) => httpsCallable<I, O>(fns, name)(data).then(r => r.data);
 export const api = {
+  whoami: call<void, { uid: string; role: string; team: number | null; canUnlock: boolean; nama: string | null }>('whoami'),
   startAttempt: call<void, { attempt: unknown; remainingMs: number }>('startAttempt'),
   getQuestions: call<void, Array<{ id: string; type: string; prompt: string; options?: string[] }>>('getQuestions'),
   saveAnswer: call<{ qid: string; value: string }, { remainingMs: number }>('saveAnswer'),

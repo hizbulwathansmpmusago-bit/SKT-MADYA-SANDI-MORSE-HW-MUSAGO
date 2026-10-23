@@ -15,6 +15,10 @@ import { importRoster, toCsv } from './roster';
 // Region HARUS sama dengan FUNCTIONS_REGION di web/firebase-config.js (sebelumnya tidak diset -> default us-central1 -> panggilan klien gagal).
 setGlobalOptions({ region: 'asia-southeast2', maxInstances: 10 });
 initializeApp(); const db = getFirestore();
+// Opsi callable eksplisit. cors:true -> preflight OPTIONS dijawab dengan header CORS; invoker:'public' -> Cloud Run mengizinkan pemanggil tanpa IAM
+// (keamanan tetap pada token Firebase Auth + pemeriksaan peran di actor()). Tanpa invoker publik, preflight ditolak 403 tanpa header CORS dan
+// browser melaporkannya sebagai "CORS error".
+const CALL = { cors: true, invoker: 'public' } as const;
 
 const store: A.Store = {
   nowMs: () => Date.now(),
@@ -56,18 +60,18 @@ const adminOnly = async (r: CallableRequest) => { const w = await actor(r); if (
 
 // ===== Identitas & ujian =====
 /** Dipanggil klien setelah login: peran/regu/izin otoritatif dari server; akun nonaktif/tanpa peran ditolak di sini. */
-export const whoami = onCall(async r => guard(async () => {
+export const whoami = onCall(CALL, async r => guard(async () => {
   const w = await actor(r); const u = (await db.doc(`users/${w.uid}`).get()).data();
   return { uid: w.uid, role: w.role, team: w.team ?? null, canUnlock: w.canUnlock === true, nama: (u?.nama as string) ?? null };
 }));
-export const startAttempt = onCall(async r => guard(async () => { const w = await actor(r); return A.startAttempt(store, w, Number(w.team)); }));
-export const getQuestions = onCall(async r => guard(async () => A.getQuestions(store, await actor(r))));
-export const saveAnswer = onCall(async r => guard(async () => A.saveAnswer(store, await actor(r), String(r.data.qid), String(r.data.value))));
-export const reportVisibilityLoss = onCall(async r => guard(async () => A.reportVisibilityLoss(store, await actor(r))));
-export const submitAttempt = onCall(async r => guard(async () => A.submitAttempt(store, await actor(r))));
-export const getResult = onCall(async r => guard(async () => A.getResult(store, await actor(r))));
-export const setManualScore = onCall(async r => guard(async () => A.setManualScore(store, await actor(r), String(r.data.uid), r.data.field, r.data.value)));
-export const unlockAttempt = onCall(async r => guard(async () => A.unlockAttempt(store, await actor(r), String(r.data.uid), String(r.data.reason ?? ''), Number(r.data.extraMin ?? 0))));
+export const startAttempt = onCall(CALL, async r => guard(async () => { const w = await actor(r); return A.startAttempt(store, w, Number(w.team)); }));
+export const getQuestions = onCall(CALL, async r => guard(async () => A.getQuestions(store, await actor(r))));
+export const saveAnswer = onCall(CALL, async r => guard(async () => A.saveAnswer(store, await actor(r), String(r.data.qid), String(r.data.value))));
+export const reportVisibilityLoss = onCall(CALL, async r => guard(async () => A.reportVisibilityLoss(store, await actor(r))));
+export const submitAttempt = onCall(CALL, async r => guard(async () => A.submitAttempt(store, await actor(r))));
+export const getResult = onCall(CALL, async r => guard(async () => A.getResult(store, await actor(r))));
+export const setManualScore = onCall(CALL, async r => guard(async () => A.setManualScore(store, await actor(r), String(r.data.uid), r.data.field, r.data.value)));
+export const unlockAttempt = onCall(CALL, async r => guard(async () => A.unlockAttempt(store, await actor(r), String(r.data.uid), String(r.data.reason ?? ''), Number(r.data.extraMin ?? 0))));
 export const closeExpired = onSchedule('every 1 minutes', async () => {
   const s = await db.collection('attempts').where('status', '==', 'in_progress').get(); await A.closeExpired(store, s.docs.map(d => d.id));
 });
@@ -90,12 +94,12 @@ const authError = (e: unknown): never => {
   if (c.includes('invalid-email')) throw new HttpsError('invalid-argument', 'Format email tidak valid');
   throw e;
 };
-export const adminCreateAccount = onCall(async r => guard(async () => {
+export const adminCreateAccount = onCall(CALL, async r => guard(async () => {
   const w = await adminOnly(r); const plan = planAccount(r.data ?? {});
   try { const res = await provision(plan); await store.addAudit({ atMs: Date.now(), actor: w.uid, action: 'create_account', target: res.uid, detail: { role: plan.claims.role, team: plan.claims.team ?? null } }); return { ...res, email: plan.email }; }
   catch (e) { return authError(e); }
 }));
-export const adminSetRole = onCall(async r => guard(async () => {
+export const adminSetRole = onCall(CALL, async r => guard(async () => {
   const w = await adminOnly(r); const uid = String(r.data?.uid ?? ''); assertNotSelf(w, uid, 'mengubah peran');
   const auth = getAuth(); const rec = await auth.getUser(uid).catch(() => null); if (!rec) throw new HttpsError('not-found', 'Akun tidak ditemukan');
   const prof = (await db.doc(`users/${uid}`).get()).data() ?? {};
@@ -110,7 +114,7 @@ export const adminSetRole = onCall(async r => guard(async () => {
 async function activeAdminsExcluding(uid: string): Promise<number> {
   const s = await db.collection('users').where('role', '==', 'admin').get(); return s.docs.filter(d => d.id !== uid && d.data().disabled !== true).length;
 }
-export const adminSetDisabled = onCall(async r => guard(async () => {
+export const adminSetDisabled = onCall(CALL, async r => guard(async () => {
   const w = await adminOnly(r); const uid = String(r.data?.uid ?? ''); const disabled = r.data?.disabled === true; assertNotSelf(w, uid, 'menonaktifkan');
   const auth = getAuth(); const rec = await auth.getUser(uid).catch(() => null); if (!rec) throw new HttpsError('not-found', 'Akun tidak ditemukan');
   if (disabled && rec.customClaims?.role === 'admin') assertAdminRemains(await activeAdminsExcluding(uid));
@@ -119,14 +123,14 @@ export const adminSetDisabled = onCall(async r => guard(async () => {
   await store.addAudit({ atMs: Date.now(), actor: w.uid, action: disabled ? 'disable_account' : 'enable_account', target: uid }); return { ok: true };
 }));
 /** Tautan atur-ulang password (bukan password). Kirim ke pemilik akun lewat saluran pribadi; berlaku sekali pakai & kedaluwarsa. */
-export const adminResetLink = onCall(async r => guard(async () => {
+export const adminResetLink = onCall(CALL, async r => guard(async () => {
   const w = await adminOnly(r); const rec = await getAuth().getUser(String(r.data?.uid ?? '')).catch(() => null);
   if (!rec?.email) throw new HttpsError('not-found', 'Akun tidak ditemukan');
   const linkAtur = await getAuth().generatePasswordResetLink(rec.email);
   await store.addAudit({ atMs: Date.now(), actor: w.uid, action: 'reset_link', target: rec.uid }); return { email: rec.email, linkAtur };
 }));
 /** Impor roster CSV -> akun peserta TANPA password + tautan atur password. Nama asli dipertahankan; duplikasi ditandai; baris yang sudah ada dilewati. */
-export const adminImportRoster = onCall({ timeoutSeconds: 300 }, async r => guard(async () => {
+export const adminImportRoster = onCall({ ...CALL, timeoutSeconds: 300 }, async r => guard(async () => {
   const w = await adminOnly(r); const res = importRoster(String(r.data?.csv ?? '')); if (r.data?.dryRun) return res;
   const akun: Array<{ nama: string; email: string; status: 'dibuat' | 'sudah_ada' | 'gagal'; linkAtur?: string; pesan?: string }> = [];
   for (const row of res.rows) {
@@ -144,7 +148,7 @@ export const adminImportRoster = onCall({ timeoutSeconds: 300 }, async r => guar
   await store.addAudit({ atMs: Date.now(), actor: w.uid, action: 'import_roster', target: '*', detail: { dibuat: akun.filter(a => a.status === 'dibuat').length, total: res.rows.length } });
   return { ...res, akun };
 }));
-export const adminExportCsv = onCall(async r => guard(async () => {
+export const adminExportCsv = onCall(CALL, async r => guard(async () => {
   await adminOnly(r);
   const cfg = await store.getConfig(); const [us, as] = await Promise.all([db.collection('users').where('role', '==', 'peserta').get(), db.collection('attempts').get()]);
   const at = new Map(as.docs.map(d => [d.id, d.data() as A.Attempt]));
@@ -154,16 +158,16 @@ export const adminExportCsv = onCall(async r => guard(async () => {
 }));
 
 // ===== Konfigurasi ujian & bank soal (admin) =====
-export const adminSetConfig = onCall(async r => guard(async () => {
+export const adminSetConfig = onCall(CALL, async r => guard(async () => {
   const w = await adminOnly(r); const cfg = A.validateConfig(r.data ?? {}); const before = await store.getConfig();
   await db.doc('config/exam').set(cfg); await store.addAudit({ atMs: Date.now(), actor: w.uid, action: 'set_config', target: 'config/exam', detail: { before, after: cfg } }); return cfg;
 }));
-export const adminEndExam = onCall(async r => guard(async () => {
+export const adminEndExam = onCall(CALL, async r => guard(async () => {
   const w = await adminOnly(r); const cfg = await store.getConfig(); await db.doc('config/exam').set({ ...cfg, status: 'ended' });
   const s = await db.collection('attempts').where('status', '==', 'in_progress').get(); return { dikirimPaksa: await A.endExam(store, w, s.docs.map(d => d.id)) };
 }));
-export const adminListQuestions = onCall(async r => guard(async () => { await adminOnly(r); return { questions: await store.getQuestions() }; }));
-export const adminSaveQuestion = onCall(async r => guard(async () => {
+export const adminListQuestions = onCall(CALL, async r => guard(async () => { await adminOnly(r); return { questions: await store.getQuestions() }; }));
+export const adminSaveQuestion = onCall(CALL, async r => guard(async () => {
   const w = await adminOnly(r); const q = (r.data ?? {}) as Question & { order?: number };
   if (!['decode', 'encode', 'knowledge'].includes(q.type) || !q.prompt || !q.answer) throw new HttpsError('invalid-argument', 'Soal tidak lengkap');
   if (q.type === 'knowledge' && !(q.options ?? []).includes(q.answer)) throw new HttpsError('invalid-argument', 'Kunci harus salah satu opsi');
@@ -173,7 +177,7 @@ export const adminSaveQuestion = onCall(async r => guard(async () => {
   await db.doc(`answerKeys/${id}`).set({ answer: q.answer });
   await store.addAudit({ atMs: Date.now(), actor: w.uid, action: 'save_question', target: id }); return { id };
 }));
-export const adminDeleteQuestion = onCall(async r => guard(async () => {
+export const adminDeleteQuestion = onCall(CALL, async r => guard(async () => {
   const w = await adminOnly(r); const id = String(r.data?.id); await db.doc(`questions/${id}`).delete(); await db.doc(`answerKeys/${id}`).delete();
   await store.addAudit({ atMs: Date.now(), actor: w.uid, action: 'delete_question', target: id }); return { ok: true };
 }));

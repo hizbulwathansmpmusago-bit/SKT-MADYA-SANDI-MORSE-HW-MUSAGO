@@ -2,16 +2,18 @@
 // Yang diuji: logika frontend (validasi, pesan galat, pemulihan sesi, routing per peran, manajemen akun).
 // Yang TIDAK diuji di sini: Firebase Auth/Firestore/Functions sungguhan, Firestore Rules.
 import { createRequire } from 'node:module'; import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
-const require = createRequire(import.meta.url); const { chromium } = require('/home/claude/.npm-global/lib/node_modules/playwright');
+const require = createRequire(import.meta.url);
+const { chromium } = (() => { try { return require('playwright'); } catch { return require('/home/claude/.npm-global/lib/node_modules/playwright'); } })();
 process.env.PLAYWRIGHT_BROWSERS_PATH ||= '/opt/pw-browsers';
 const here = path.dirname(fileURLToPath(import.meta.url)), web = path.resolve(here, '../../web');
 const FAKE = fs.readFileSync(path.join(here, 'fake-firebase.js'), 'utf8');
 const TEST_CFG = `export const firebaseConfig={apiKey:'AIzaTESTTESTTESTTESTTESTTESTTESTTEST12',authDomain:'uji.firebaseapp.com',projectId:'uji-proyek',appId:'1:1:web:abc'};export const FUNCTIONS_REGION='asia-southeast2';export const USE_EMULATORS=false;`;
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png' };
 let cfgMode = 'test';
+const PLACEHOLDER_CFG = `export const firebaseConfig={apiKey:'ISI_API_KEY',authDomain:'ISI_PROJECT_ID.firebaseapp.com',projectId:'ISI_PROJECT_ID',appId:'ISI_APP_ID'};export const FUNCTIONS_REGION='asia-southeast2';export const USE_EMULATORS=false;`;
 const srv = http.createServer((q, r) => {
   let p = decodeURIComponent(q.url.split('?')[0]); if (p === '/') p = '/index.html';
-  if (p === '/firebase-config.js' && cfgMode === 'test') { r.writeHead(200, { 'content-type': 'text/javascript' }); return r.end(TEST_CFG); }
+  if (p === '/firebase-config.js' && cfgMode !== 'asli') { r.writeHead(200, { 'content-type': 'text/javascript' }); return r.end(cfgMode === 'placeholder' ? PLACEHOLDER_CFG : TEST_CFG); }
   const f = path.join(web, p); if (!f.startsWith(web) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end('404'); }
   r.writeHead(200, { 'content-type': mime[path.extname(f)] || 'application/octet-stream' }); r.end(fs.readFileSync(f));
 });
@@ -54,11 +56,21 @@ const overflow = page => page.evaluate(() => document.documentElement.scrollWidt
 async function T(name, fn) { current = name; console.log('• ' + name); try { await fn(); } catch (e) { check('tes selesai tanpa pengecualian', false, e.message.split('\n')[0]); } }
 
 await T('1. Firebase belum dikonfigurasi (placeholder) -> pesan jelas, tidak ada login palsu', async () => {
-  cfgMode = 'asli'; const { ctx, page } = await open(); await page.goto(base + '/#/login'); await page.waitForTimeout(400);
+  cfgMode = 'placeholder'; const { ctx, page } = await open(); await page.goto(base + '/#/login'); await page.waitForTimeout(400);
   check('banner konfigurasi tampil', /belum dikonfigurasi/i.test(await text(page, '#banner')));
   await page.fill('#lg-email', 'budi@contoh.id'); await page.fill('#lg-pass', PW); await page.click('#login-btn');
   check('login ditolak dengan pesan konfigurasi', /belum dikonfigurasi/i.test(await text(page, '#login-err')));
   check('tidak masuk ke dashboard', !(await page.evaluate(() => location.hash)).includes('dashboard')); await ctx.close(); cfgMode = 'test';
+});
+await T('1b. web/firebase-config.js di repo: terisi nyata, region sesuai backend, bukan placeholder', async () => {
+  const cfg = fs.readFileSync(path.join(web, 'firebase-config.js'), 'utf8');
+  check('tanpa placeholder ISI_', !cfg.includes('ISI_')); check('region asia-southeast2', /FUNCTIONS_REGION\s*=\s*"asia-southeast2"/.test(cfg));
+  check('projectId terisi', /projectId:\s*"[a-z0-9-]{4,30}"/.test(cfg));
+  const idx = fs.readFileSync(path.join(web, 'script.js'), 'utf8');
+  check('frontend memakai httpsCallable dengan getFunctions(app, FUNCTIONS_REGION)', /httpsCallable\(fb\.fns/.test(idx) && /getFunctions\(app, FUNCTIONS_REGION\)/.test(idx));
+  check('tidak ada fetch langsung ke endpoint fungsi', !/fetch\(/.test(idx) && !/cloudfunctions\.net|\.run\.app/.test(idx.replace(/console\.error[^\n]*/g, '')));
+  const be = fs.readFileSync(path.join(here, '../../functions/src/index.ts'), 'utf8');
+  check('backend region sama dengan frontend', /setGlobalOptions\(\{ region: 'asia-southeast2'/.test(be));
 });
 await T('2. Validasi formulir', async () => {
   const { ctx, page } = await open(); await page.goto(base + '/#/login'); await page.waitForSelector('#lg-email');
@@ -133,6 +145,14 @@ await T('8. Jaringan putus saat pemulihan sesi -> banner Coba lagi, bukan keluar
   await page.click('[data-act=retry-auth]'); await page.waitForFunction(() => !document.querySelector('#userchip').hidden); check('setelah jaringan pulih, masuk kembali', true);
   await page.evaluate(() => { const s = JSON.parse(localStorage.__fakeState); s.fnMissing = 'whoami'; localStorage.__fakeState = JSON.stringify(s); }); await page.reload(); await page.waitForTimeout(600);
   check('fungsi whoami tidak ter-deploy -> pesan jelas & keluar', /belum tersedia di server/i.test(await toasts(page)), await toasts(page)); await ctx.close();
+});
+await T('8b. Fungsi backend tak terjangkau (internal/CORS) -> pesan jelas, keluar bersih, petunjuk di console', async () => {
+  const { ctx, page } = await open(); const logs = []; page.on('console', m => { if (m.type() === 'error') logs.push(m.text()); });
+  await login(page, 'budi@contoh.id', PW); await wait(page, '#/dashboard');
+  await page.evaluate(() => { const s = JSON.parse(localStorage.__fakeState); s.fnInternal = 'whoami'; localStorage.__fakeState = JSON.stringify(s); }); await page.reload(); await page.waitForTimeout(700);
+  check('pesan backend tak terjangkau', /tidak dapat dihubungi/i.test(await toasts(page)), await toasts(page));
+  check('petunjuk diagnosa di console', logs.some(t => /check-functions\.mjs/.test(t)), logs.join('|').slice(0, 120));
+  check('keluar bersih', await page.locator('#userchip').isHidden()); await ctx.close();
 });
 await T('9. Lupa password', async () => {
   const { ctx, page } = await open(); await page.goto(base + '/#/login'); await page.waitForSelector('[data-act=forgot]'); await page.click('[data-act=forgot]');

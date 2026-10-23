@@ -1,0 +1,45 @@
+# CI: hanya build + tes. TIDAK melakukan deploy apa pun ke Firebase.
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+permissions: { contents: read }
+jobs:
+  struktur:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Struktur repo sesuai firebase.json
+        run: |
+          for f in firebase.json firestore.rules functions/package.json functions/tsconfig.json functions/src/index.ts functions/src/attempts.ts functions/src/authz.ts functions/src/morse.ts functions/src/roster.ts web/index.html web/script.js web/firebase-config.js; do
+            test -f "$f" || { echo "HILANG: $f (repo terunggah rata? lihat DEPLOY.md bagian Migrasi)"; exit 1; }
+          done
+      - name: Konfigurasi bukan placeholder & kredensial tidak ter-commit
+        run: |
+          ! grep -q "ISI_" web/firebase-config.js
+          ! git ls-files | grep -Ei "service-?account.*\.json|firebase-adminsdk|\.pem$|\.key$"
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install
+        working-directory: functions
+      - run: npm run build
+        working-directory: functions
+      - run: npm test
+        working-directory: functions
+  frontend-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - name: index.html (GitHub Pages) harus up-to-date dengan web/
+        run: |
+          python3 build-satu-berkas.py
+          git diff --exit-code -- index.html index-satu-berkas.html

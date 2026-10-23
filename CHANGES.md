@@ -1,3 +1,18 @@
+# Perbaikan struktur repo & backend (login gagal / CORS)
+**Akar masalah:** repo terunggah rata (tanpa folder `functions/`, `web/`, dll.) sehingga `firebase.json` menunjuk folder yang tidak ada dan backend tidak pernah ter-deploy dari repo; permintaan ke fungsi yang tidak ada/ditolak muncul sebagai error CORS + galat `internal`. Detail: `DEPLOY.md`.
+
+Diubah/ditambah:
+- Struktur dipulihkan: `functions/` (src, test, package.json, tsconfig.json), `web/`, `scripts/`, `tests/e2e/`, `seed/`.
+- `web/firebase-config.js` — memakai konfigurasi publik proyek yang ada di repo (region `asia-southeast2`).
+- `functions/tsconfig.json` (`rootDir src`, `outDir lib`, `types ["node"]`), `functions/package.json` (`engines node 20`, skrip build/serve/test).
+- `functions/src/index.ts` — `cors:true` + `invoker:'public'` eksplisit pada semua callable (preflight tidak diblokir IAM).
+- `firebase.json` — `runtime nodejs20`, predeploy `$RESOURCE_DIR`; `.firebaserc`; `.gitignore` (blokir kredensial); `.nojekyll`; `package.json` root.
+- `web/script.js` — pesan jelas + petunjuk console saat fungsi tak terjangkau; `web/src/lib/api.ts` memakai region dari config. Frontend sudah memakai `httpsCallable` (tidak ada `fetch` langsung).
+- `build-satu-berkas.py` — menulis `index.html` root (GitHub Pages, URL tetap) dan `index-satu-berkas.html`.
+- Baru: `scripts/check-functions.mjs` + `probe-core.mjs` (diagnosa 404/403/5xx/CORS), `scripts/migrate-from-flat.sh`, `.github/workflows/ci.yml` (build+tes, tanpa deploy), `DEPLOY.md`, `functions/test/probe.test.ts`.
+- Tidak diubah: desain, fitur ujian/bank soal/penilaian/penguncian, otorisasi per peran, `firestore.rules` (ditinjau: tidak terbuka, penutup `deny` di akhir).
+
+---
 # Perubahan — perbaikan sistem login (dari zip "diperbarui")
 
 ## Temuan penyebab login/fitur tidak jalan

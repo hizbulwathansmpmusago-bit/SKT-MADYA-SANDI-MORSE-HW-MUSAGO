@@ -1,5 +1,5 @@
-
 // Konfigurasi Firebase SKT Madya Sandi Morse HW Musago
+// Nilai web-config ini PUBLIK (bukan rahasia). Keamanan ada di Firestore Rules + Cloud Functions.
 export const firebaseConfig = {
   apiKey: "AIzaSyAVfkxU1HDhOmR_akYDgu_fX24_I6aHweg",
   authDomain: "sktmadya-sandi-morse-hw-musago.firebaseapp.com",
@@ -9,6 +9,6 @@ export const firebaseConfig = {
   appId: "1:807098321609:web:42e185acc91572c63e9b18",
   measurementId: "G-EFT11XFM5V"
 };
-
+// HARUS sama dengan setGlobalOptions({ region }) di functions/src/index.ts
 export const FUNCTIONS_REGION = "asia-southeast2";
 export const USE_EMULATORS = false;
