@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#009B4D">
+<title>SKT Madya • Sandi Morse HW Musago</title>
+<style>
+:root{--green:#009B4D;--cyan:#00AFC7;--dark:#172B3A;--bg:#F7F9FA;--card:#fff;--muted:#657581;--line:#dce5e8;--red:#c62828;--gold:#9a6700}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--dark)}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:12px;padding:11px 15px;background:var(--green);color:#fff;font-weight:700}button.secondary{background:#e8f6ef;color:#08763e;border:1px solid #c8ead7}button.dark{background:var(--dark)}button.danger{background:#fff0f0;color:var(--red);border:1px solid #ffd4d4}button:disabled{opacity:.5;cursor:not-allowed}
+header{background:linear-gradient(115deg,var(--green),var(--cyan));color:white;padding:20px max(18px,calc((100% - 1100px)/2));display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}header h1{font-size:clamp(1.15rem,3vw,1.65rem);margin:0}header p{margin:5px 0 0;opacity:.94;font-size:.92rem}.brand{display:flex;align-items:center;gap:13px}.logo{width:48px;height:48px;border:2px solid #ffffff9c;border-radius:14px;display:grid;place-items:center;font-weight:900;font-size:1.2rem}
+main{max-width:1100px;margin:22px auto;padding:0 16px 50px}.panel,.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 5px 20px #172b3a08}.stack{display:grid;gap:16px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}h2{margin:0 0 12px;font-size:1.25rem}h3{margin:0 0 8px;font-size:1rem}p{line-height:1.55}.muted{color:var(--muted);font-size:.92rem}.field{display:grid;gap:6px;margin:12px 0}.field label{font-size:.9rem;font-weight:700}.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid #cbd8dd;border-radius:11px;background:#fff;color:var(--dark)}.field textarea{min-height:90px;resize:vertical}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab{background:#eaf0f2;color:var(--dark)}.tab.active{background:var(--dark);color:white}.pill{display:inline-block;padding:4px 9px;border-radius:99px;background:#e8f6ef;color:#08763e;font-size:.8rem;font-weight:700}.pill.blue{background:#e5f8fb;color:#00798a}.pill.gray{background:#edf1f3;color:#51616b}.pill.red{background:#fff0f0;color:var(--red)}.notice{padding:12px 14px;border-radius:12px;background:#fff8df;border:1px solid #f0dfa1;color:#654d00;font-size:.9rem;line-height:1.5}.success{background:#eaf8ef;border-color:#bce5ca;color:#146b36}.hidden{display:none!important}.stat{padding:16px;border-radius:14px;background:#f4f8f9;border:1px solid var(--line)}.stat strong{font-size:1.55rem;display:block}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:600px}th,td{text-align:left;padding:11px;border-bottom:1px solid var(--line);font-size:.9rem}th{background:#f3f7f8}.question{padding:15px;border:1px solid var(--line);border-radius:14px;margin:12px 0}.question .prompt{font-size:1.1rem;font-weight:800;letter-spacing:.4px}.question input{margin-top:10px}.morse{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:1px}.footer{text-align:center;color:var(--muted);font-size:.82rem;padding:20px}
+@media(max-width:680px){.grid,.grid3{grid-template-columns:1fr}main{margin-top:14px;padding:0 12px 35px}.panel,.card{padding:15px}header{padding:16px}.logo{width:42px;height:42px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">HW</div><div><h1>SKT Madya • Sandi Morse</h1><p>Qabilah Buya Hamka · HW Musago</p></div></div><div id="headerRight"></div></header>
+<main>
+<section id="login" class="panel" style="max-width:560px;margin:25px auto">
+<h2>Masuk ke sistem SKT</h2><p class="muted">Pilih peran dan masukkan kode akses dari panitia.</p>
+<div class="field"><label for="role">Peran</label><select id="role"><option value="peserta">Peserta</option><option value="penguji">Penguji Formatur DP9</option><option value="admin">Panitia / Admin</option></select></div>
+<div class="field"><label for="accessCode">Kode akses</label><input id="accessCode" autocomplete="off" placeholder="Masukkan kode akses"></div>
+<div id="participantFields"><div class="field"><label for="participantName">Nama lengkap peserta</label><input id="participantName" placeholder="Nama sesuai daftar peserta"></div><div class="field"><label for="team">Regu</label><select id="team"><option value="1">Regu 1</option><option value="2">Regu 2</option><option value="3">Regu 3</option><option value="4">Regu 4</option><option value="5">Regu 5</option><option value="6">Regu 6</option><option value="7">Regu 7</option></select></div></div>
+<div class="notice">Prototype awal: kode demo adalah <b>HWADMIN26</b> untuk admin, <b>PENGUJI1</b> sampai <b>PENGUJI7</b> untuk penguji, dan <b>PESERTA26</b> untuk peserta. Jangan gunakan kode demo ini untuk ujian resmi.</div>
+<div style="margin-top:15px"><button id="loginBtn" style="width:100%">Masuk</button></div><p id="loginError" class="muted" role="alert"></p>
+</section>
+<section id="app" class="hidden stack">
+<div class="between"><div><h2 id="welcome">Dashboard</h2><div id="subwelcome" class="muted"></div></div><button class="secondary" id="logout">Keluar</button></div>
+<div id="studentView" class="hidden stack">
+<div class="grid3"><div class="stat"><span class="muted">Regu</span><strong id="studentTeam">—</strong></div><div class="stat"><span class="muted">Soal</span><strong id="studentCount">10</strong></div><div class="stat"><span class="muted">Status</span><strong id="studentStatus" style="font-size:1.1rem">Belum mulai</strong></div></div>
+<div class="panel"><h2>Ringkasan materi Morse</h2><p>Sandi Morse menggunakan titik (<b>.</b>) dan garis (<b>-</b>). Pisahkan setiap huruf dengan spasi dan kata dengan garis miring (<b>/</b>).</p><p class="morse"><b>A</b> .- &nbsp; <b>B</b> -... &nbsp; <b>C</b> -.-. &nbsp; <b>D</b> -.. &nbsp; <b>E</b> . &nbsp; <b>F</b> ..-. &nbsp; <b>G</b> --. &nbsp; <b>H</b> .... &nbsp; <b>I</b> .. &nbsp; <b>J</b> .---</p><p class="morse"><b>K</b> -.- &nbsp; <b>L</b> .-.. &nbsp; <b>M</b> -- &nbsp; <b>N</b> -. &nbsp; <b>O</b> --- &nbsp; <b>P</b> .--. &nbsp; <b>Q</b> --.- &nbsp; <b>R</b> .-. &nbsp; <b>S</b> ... &nbsp; <b>T</b> -</p><p class="morse"><b>U</b> ..- &nbsp; <b>V</b> ...- &nbsp; <b>W</b> .-- &nbsp; <b>X</b> -..- &nbsp; <b>Y</b> -.-- &nbsp; <b>Z</b> --..</p><p class="muted">Saat ujian, kunci jawaban tidak ditampilkan. Pastikan jawaban sudah diperiksa sebelum dikirim.</p></div>
+<div class="panel"><div class="between"><h2>Ujian Sandi Morse</h2><span class="pill blue">10 soal · 2 jenis</span></div><p class="muted">Jawaban diperiksa otomatis. Setelah dikirim, jawaban tidak dapat diubah pada sesi ini.</p><div id="quiz"></div><button id="submitQuiz">Kirim jawaban & nilai otomatis</button><div id="studentResult" class="hidden"></div></div>
+</div>
+<div id="examinerView" class="hidden stack">
+<div class="panel"><h2>Dashboard penguji</h2><p class="muted">Kamu hanya melihat peserta dari regu yang ditugaskan. Nilai dihitung otomatis oleh sistem.</p><div class="grid3"><div class="stat"><span class="muted">Regu tugas</span><strong id="examTeam">—</strong></div><div class="stat"><span class="muted">Peserta masuk</span><strong id="examParticipants">0</strong></div><div class="stat"><span class="muted">Sudah ujian</span><strong id="examCompleted">0</strong></div></div></div>
+<div class="panel"><div class="between"><h2>Daftar peserta dan hasil</h2><button class="secondary" id="refreshExam">Perbarui tampilan</button></div><div class="tablewrap" id="examTable"></div></div>
+</div>
+<div id="adminView" class="hidden stack">
+<div class="notice">Mode demo menyimpan data pada browser/perangkat ini saja. Untuk dipakai bersama secara langsung di banyak HP, hubungkan aplikasi ke Firebase atau backend dengan autentikasi dan aturan akses server.</div>
+<div class="grid3"><div class="stat"><span class="muted">Regu</span><strong>7</strong></div><div class="stat"><span class="muted">Penguji</span><strong>7</strong></div><div class="stat"><span class="muted">Peserta tercatat</span><strong id="adminParticipants">0</strong></div></div>
+<div class="panel"><div class="between"><h2>Rekap seluruh regu</h2><div class="row"><button class="secondary" id="exportCsv">Unduh CSV</button><button class="danger" id="clearData">Hapus data demo</button></div></div><div class="tablewrap" id="adminTable"></div></div>
+<div class="panel"><h2>Pembagian penguji</h2><div class="tablewrap"><table><thead><tr><th>Regu</th><th>Akses demo penguji</th><th>Penugasan</th></tr></thead><tbody id="assignmentTable"></tbody></table></div></div>
+<div class="panel"><h2>Kelola soal (rancangan)</h2><p>Versi ini memakai 10 soal contoh yang tertanam di file. Untuk ujian resmi, panitia perlu mengelola bank soal dan kunci jawaban melalui dashboard admin yang terproteksi di backend.</p><button class="secondary" id="resetQuiz">Reset semua hasil ujian</button></div>
+</div>
+</section>
+<div id="exitWarning" class="hidden" role="dialog" aria-modal="true" aria-labelledby="exitTitle" style="position:fixed;inset:0;background:#172b3acc;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px">
+ <div class="panel" style="max-width:440px;width:100%;text-align:center">
+  <div style="font-size:2.2rem">⚠️</div><h2 id="exitTitle">Peringatan Keluar Ujian</h2>
+  <p>Jika kamu keluar dari halaman ujian, percobaan akan dikunci dan kamu tidak dapat mengerjakan kembali. Pastikan kamu memang ingin keluar.</p>
+  <div class="row" style="justify-content:center"><button id="stayInExam" class="secondary">Tetap mengerjakan</button><button id="confirmExit" class="danger">Keluar dan kunci</button></div>
+ </div>
+</div>
+<div class="footer">SKT Madya · Sandi Morse · HW Musago</div>
+</main>
+<script>
+const MORSE={A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..','0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.'};
+const QUESTIONS=[
+{type:'decode',prompt:'.... . .-.. .-.. ---',answer:'HELLO'},
+{type:'decode',prompt:'.-- .- .-. --. .-',answer:'WARGA'},
+{type:'decode',prompt:'.... .-- / -- ..- ... .- --. ---',answer:'HW MUSAGO'},
+{type:'decode',prompt:'... -.- -',answer:'SKT'},
+{type:'decode',prompt:'.--. .- -. -.. ..-',answer:'PANDU'},
+{type:'encode',prompt:'HIZBUL',answer:'.... .. --.. -... ..- .-..'},
+{type:'encode',prompt:'MORSE',answer:'-- --- .-. ... .'},
+{type:'encode',prompt:'MADYA',answer:'-- .- -.. -.-- .-'},
+{type:'encode',prompt:'REGU TUJUH',answer:'.-. . --. ..- / - ..- .--- ..- ....'},
+{type:'encode',prompt:'HW MUSAGO',answer:'.... .-- / -- ..- ... .- --. ---'}
+];
+const STORE='hwMusagoSktDemoV1';let current=null,submitted=false,exitLocked=false;
+function playWarning(){
+ try{
+  const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;
+  const ctx=new Ctx(),now=ctx.currentTime;
+  [880,660,880].forEach((freq,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(.0001,now+i*.18);g.gain.exponentialRampToValueAtTime(.22,now+i*.18+.025);g.gain.exponentialRampToValueAtTime(.0001,now+i*.18+.14);o.connect(g);g.connect(ctx.destination);o.start(now+i*.18);o.stop(now+i*.18+.15)});
+  setTimeout(()=>ctx.close(),800);
+ }catch(e){}
+}
+function showExitWarning(){if(current&&current.role==='peserta'&&!submitted&&!exitLocked){playWarning();document.getElementById('exitWarning').classList.remove('hidden');document.getElementById('exitWarning').style.display='flex';}}
+function lockAttempt(){
+ if(!current||current.role!=='peserta')return;
+ const d=readData();const key=current.name.toLowerCase()+'|'+current.team;
+ d.locked=d.locked||[];if(!d.locked.includes(key))d.locked.push(key);saveData(d);
+ exitLocked=true;submitted=true;
+ document.getElementById('exitWarning').classList.add('hidden');
+ document.getElementById('studentStatus').textContent='Terkunci';
+ document.getElementById('quiz').innerHTML='<div class="notice"><b>Percobaan terkunci.</b><br>Kamu telah memilih keluar sebelum mengirim jawaban. Kamu tidak dapat mengerjakan kembali pada sesi ini. Hubungi panitia jika terjadi kesalahan.</div>';
+ document.getElementById('submitQuiz').disabled=true;
+}
+function readData(){try{return JSON.parse(localStorage.getItem(STORE))||{attempts:[]}}catch(e){return{attempts:[]}}}
+function saveData(d){localStorage.setItem(STORE,JSON.stringify(d))}
+function norm(s){return String(s||'').toUpperCase().trim().replace(/[.,!?;:]/g,'').replace(/\s*\/\s*/g,' / ').replace(/\s+/g,' ')}
+function encode(s){return norm(s).split(' ').map(w=>w.split('').map(c=>MORSE[c]||'').join(' ')).join(' / ')}
+function normMorse(s){return String(s||'').trim().replace(/[•·]/g,'.').replace(/[–—−]/g,'-').replace(/\s*\/\s*/g,' / ').replace(/\s+/g,' ')}
+function getCodeText(code){return String(code||'').trim().toUpperCase()}
+function show(id,on=true){document.getElementById(id).classList.toggle('hidden',!on)}
+function login(){
+ const role=document.getElementById('role').value,code=getCodeText(document.getElementById('accessCode').value);
+ const name=document.getElementById('participantName').value.trim(),team=Number(document.getElementById('team').value);
+ let user=null;
+ if(role==='admin'&&code==='HWADMIN26')user={role,name:'Panitia / Admin'};
+ if(role==='penguji'&&/^PENGUJI[1-7]$/.test(code))user={role,name:'Formatur DP9 '+code.slice(-1),team:Number(code.slice(-1))};
+ if(role==='peserta'&&code==='PESERTA26'&&name)user={role,name,team};
+ if(!user){document.getElementById('loginError').textContent='Kode akses tidak sesuai, atau nama peserta belum diisi.';return}
+ if(user.role==='peserta'){
+  const d=readData(),key=user.name.toLowerCase()+'|'+user.team;
+  if((d.locked||[]).includes(key)){document.getElementById('loginError').textContent='Percobaan peserta ini sudah terkunci. Hubungi panitia.';return}
+  if(d.attempts.some(a=>a.name.toLowerCase()===user.name.toLowerCase()&&a.team===user.team)){document.getElementById('loginError').textContent='Ujian untuk nama dan regu ini sudah pernah dikirim.';return}
+ }
+ current=user;submitted=false;exitLocked=false;show('login',false);show('app',true);document.getElementById('headerRight').innerHTML='<span class="pill">'+esc(user.role.toUpperCase())+'</span>';
+ document.getElementById('welcome').textContent=user.role==='peserta'?'Halo, '+user.name:user.name;
+ document.getElementById('subwelcome').textContent=user.role==='peserta'?'Peserta · Regu '+user.team:user.role==='penguji'?'Akses penguji · Regu '+user.team:'Akses penuh · Semua regu';
+ ['studentView','examinerView','adminView'].forEach(x=>show(x,false));
+ if(role==='peserta'){show('studentView');document.getElementById('studentTeam').textContent='Regu '+team;renderQuiz();refreshStudent()}
+ if(role==='penguji'){show('examinerView');renderExaminer()}
+ if(role==='admin'){show('adminView');renderAdmin()}
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderQuiz(){document.getElementById('quiz').innerHTML=QUESTIONS.map((q,i)=>`<div class="question"><div class="muted">Soal ${i+1} · ${q.type==='decode'?'Morse → teks':'Teks → Morse'}</div><div class="prompt ${q.type==='decode'?'morse':''}">${esc(q.prompt)}</div><div class="field"><label for="ans${i}">Jawaban</label><input id="ans${i}" ${submitted?'disabled':''} autocomplete="off" placeholder="${q.type==='decode'?'Tulis hasil terjemahan':'Tulis kode Morse (. dan -)'}"></div></div>`).join('');document.getElementById('submitQuiz').disabled=submitted}
+function refreshStudent(){let attempt=readData().attempts.find(a=>a.name===current.name&&a.team===current.team);document.getElementById('studentStatus').textContent=attempt?'Selesai':'Belum mulai';if(attempt){submitted=true;renderQuiz();QUESTIONS.forEach((q,i)=>{document.getElementById('ans'+i).value=attempt.answers[i]||'';document.getElementById('ans'+i).disabled=true});document.getElementById('studentResult').classList.remove('hidden');document.getElementById('studentResult').innerHTML=`<div class="notice success"><b>Ujian telah dikirim.</b><br>Nilai: ${attempt.score}/100 · Benar: ${attempt.correct}/${QUESTIONS.length}<br>Waktu: ${new Date(attempt.time).toLocaleString('id-ID')}</div>`;document.getElementById('submitQuiz').disabled=true}}
+function submitQuiz(){
+ if(submitted)return;const answers=QUESTIONS.map((q,i)=>document.getElementById('ans'+i).value);let correct=0;
+ QUESTIONS.forEach((q,i)=>{let a=q.type==='decode'?norm(answers[i]):normMorse(answers[i]);let expected=q.type==='decode'?norm(q.answer):normMorse(q.answer);if(a===expected)correct++});
+ const d=readData();const attempt={name:current.name,team:current.team,answers,correct,score:Math.round(correct/QUESTIONS.length*100),time:new Date().toISOString(),examiner:'Formatur DP9 '+current.team};
+ d.attempts=d.attempts.filter(a=>!(a.name.toLowerCase()===current.name.toLowerCase()&&a.team===current.team));d.attempts.push(attempt);saveData(d);submitted=true;refreshStudent()
+}
+function tableHTML(rows){return `<table><thead><tr><th>Nama</th><th>Regu</th><th>Benar</th><th>Nilai</th><th>Status</th><th>Waktu</th></tr></thead><tbody>${rows.length?rows.map(a=>`<tr><td>${esc(a.name)}</td><td>Regu ${a.team}</td><td>${a.correct}/10</td><td><b>${a.score}</b></td><td><span class="pill ${a.score>=75?'':'red'}">${a.score>=75?'Tuntas*':'Belum tuntas*'}</span></td><td>${new Date(a.time).toLocaleString('id-ID')}</td></tr>`).join(''):'<tr><td colspan="6">Belum ada hasil ujian pada perangkat ini.</td></tr>'}</tbody></table>`}
+function renderExaminer(){let all=readData().attempts.filter(a=>a.team===current.team);document.getElementById('examTeam').textContent='Regu '+current.team;document.getElementById('examParticipants').textContent=all.length;document.getElementById('examCompleted').textContent=all.length;document.getElementById('examTable').innerHTML=tableHTML(all)}
+function renderAdmin(){let all=readData().attempts;document.getElementById('adminParticipants').textContent=all.length;document.getElementById('adminTable').innerHTML=tableHTML(all);document.getElementById('assignmentTable').innerHTML=Array.from({length:7},(_,i)=>`<tr><td>Regu ${i+1}</td><td><code>PENGUJI${i+1}</code></td><td>Formatur DP9 ${i+1}</td></tr>`).join('')}
+function logout(){current=null;submitted=false;show('app',false);show('login',true);document.getElementById('headerRight').innerHTML='';document.getElementById('accessCode').value='';document.getElementById('loginError').textContent=''}
+document.getElementById('role').addEventListener('change',e=>show('participantFields',e.target.value==='peserta'));
+document.getElementById('loginBtn').addEventListener('click',login);document.getElementById('accessCode').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+document.getElementById('logout').addEventListener('click',()=>{if(current&&current.role==='peserta'&&!submitted){showExitWarning()}else{logout()}});
+document.getElementById('stayInExam').addEventListener('click',()=>{document.getElementById('exitWarning').classList.add('hidden')});
+document.getElementById('confirmExit').addEventListener('click',lockAttempt);
+window.addEventListener('beforeunload',e=>{
+ if(current&&current.role==='peserta'&&!submitted&&!exitLocked){
+  playWarning();e.preventDefault();e.returnValue='';
+ }
+});document.getElementById('submitQuiz').addEventListener('click',submitQuiz);
+document.getElementById('refreshExam').addEventListener('click',renderExaminer);
+document.getElementById('exportCsv').addEventListener('click',()=>{let rows=readData().attempts;let csv=[['Nama','Regu','Benar','Nilai','Waktu','Penguji'],...rows.map(a=>[a.name,a.team,a.correct,a.score,a.time,a.examiner])].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');let blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});let url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='rekap-skt-morse-hw-musago.csv';a.click();URL.revokeObjectURL(url)});
+document.getElementById('clearData').addEventListener('click',()=>{if(confirm('Hapus seluruh data demo pada browser ini?')){saveData({attempts:[]});renderAdmin()}});
+document.getElementById('resetQuiz').addEventListener('click',()=>{if(confirm('Reset semua hasil ujian demo pada browser ini?')){saveData({attempts:[]});renderAdmin()}});
+show('participantFields',true);
+</script>
+</body></html>

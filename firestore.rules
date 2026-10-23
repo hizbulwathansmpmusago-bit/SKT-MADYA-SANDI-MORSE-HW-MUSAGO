@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function role() { return request.auth.token.role; }
+    function isAdmin() { return signedIn() && role() == 'admin'; }
+    function isExaminer() { return signedIn() && role() == 'penguji'; }
+
+    // Profil: peserta membaca miliknya; penguji membaca peserta di regunya; tulis hanya via Cloud Functions/Admin SDK.
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin()
+        || (isExaminer() && resource.data.role == 'peserta' && resource.data.team == request.auth.token.team));
+      allow write: if false;
+    }
+    // Percobaan ujian: dibaca (bukan ditulis) klien. Jawaban/kunci/nilai diubah hanya oleh fungsi server.
+    match /attempts/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin()
+        || (isExaminer() && resource.data.team == request.auth.token.team));
+      allow write: if false;
+    }
+    // Bank soal + kunci jawaban: tidak pernah terbaca klien (peserta menerima soal tanpa kunci via fungsi getQuestions).
+    match /questions/{id} { allow read, write: if false; }
+    match /answerKeys/{id} { allow read, write: if false; }
+    // Konfigurasi ujian: semua yang login boleh baca (status/durasi); hanya server yang menulis.
+    match /config/{doc} { allow read: if signedIn(); allow write: if false; }
+    match /audit/{id} { allow read: if isAdmin(); allow write: if false; }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

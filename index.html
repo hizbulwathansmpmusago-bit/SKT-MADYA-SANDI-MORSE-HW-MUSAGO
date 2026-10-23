@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#009B4D">
+<meta name="description" content="Ujian SKT Madya Sandi Morse — Hizbul Wathan Qabilah Buya Hamka, SMP Muhammadiyah 1 Gombong.">
+<title>SKT MADYA — SANDI MORSE</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Lewati ke konten utama</a>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#/beranda" aria-label="SKT Madya Sandi Morse — Beranda">
+      <img class="logo" src="logo.png" alt="" width="44" height="44">
+      <span class="brand-t"><strong>SKT MADYA — SANDI MORSE</strong><small>Hizbul Wathan Qabilah Buya Hamka · SMP Muhammadiyah 1 Gombong</small></span>
+    </a>
+    <div class="userchip" id="userchip" hidden>
+      <span id="chip-name"></span><span class="pill light" id="chip-role"></span>
+      <button class="btn mini ghost" data-act="pw" type="button">Ganti password</button>
+      <button class="btn mini ghost" data-act="logout" type="button">Keluar</button>
+    </div>
+  </div>
+  <nav class="nav" id="nav" aria-label="Navigasi utama"></nav>
+</header>
+
+<div id="banner" class="banner" role="status" hidden></div>
+
+<main id="main" tabindex="-1">
+  <div id="boot" class="center-msg"><div class="spinner" aria-hidden="true"></div><p>Memuat aplikasi…</p></div>
+
+  <!-- 1. Beranda -->
+  <section class="page" data-page="beranda" hidden>
+    <div class="hero">
+      <img class="hero-logo" src="logo.png" alt="Logo Hizbul Wathan" width="120" height="120">
+      <p class="eyebrow">Ujian SKT Madya</p>
+      <h1>Sandi Morse Hizbul Wathan</h1>
+      <p>Belajar, berlatih, dan ujian sandi Morse dengan waktu dan nilai yang dikelola server — adil dan transparan untuk seluruh peserta.</p>
+      <div class="row" id="hero-cta"></div>
+    </div>
+    <div class="grid3 mt">
+      <article class="card"><h3>Belajar</h3><p class="muted">Pelajari tabel sandi Morse, aturan panjang titik &amp; garis, dan coba latihan dengar-ketik.</p></article>
+      <article class="card"><h3>Ujian</h3><p class="muted">Morse ke teks, teks ke Morse, dan soal pengetahuan dasar. Jawaban disimpan ke server otomatis.</p></article>
+      <article class="card"><h3>Penilaian</h3><p class="muted">Nilai teori dihitung server, ditambah nilai praktik &amp; sikap dari penguji.</p></article>
+    </div>
+    <div class="card mt"><h2>Alur ujian</h2>
+      <ol class="steps"><li>Masuk dengan akun dari panitia</li><li>Baca tata tertib &amp; aktifkan suara</li><li>Kerjakan soal sebelum waktu habis</li><li>Kirim jawaban</li><li>Lihat hasil setelah dirilis panitia</li></ol>
+    </div>
+  </section>
+
+  <!-- 2. Login -->
+  <section class="page narrow" data-page="login" hidden>
+    <div class="card">
+      <img class="login-logo" src="logo.png" alt="Logo Hizbul Wathan" width="72" height="72">
+      <h2>Masuk</h2>
+      <p class="muted">Gunakan akun yang dibagikan panitia. Setiap peserta memiliki akun sendiri — jangan berbagi password.</p>
+      <form id="login-form" novalidate>
+        <div class="field"><label for="lg-email">Email akun</label><input id="lg-email" type="email" autocomplete="username" inputmode="email" required></div>
+        <div class="field"><label for="lg-pass">Password</label><input id="lg-pass" type="password" autocomplete="current-password" required></div>
+        <p class="err" id="login-err" role="alert" hidden></p>
+        <p class="muted small" id="login-status" role="status" hidden></p>
+        <button class="btn block" id="login-btn" type="submit">Masuk</button>
+      </form>
+      <p class="muted small mt">Lupa password? <button class="linkbtn" data-act="forgot" type="button">Kirim tautan atur ulang ke email</button></p>
+    </div>
+  </section>
+
+  <!-- 3. Dashboard peserta -->
+  <section class="page" data-page="dashboard" hidden>
+    <h2 class="ptitle">Dashboard peserta</h2>
+    <div id="dash-body"></div>
+  </section>
+
+  <!-- 4. Materi -->
+  <section class="page" data-page="materi" hidden>
+    <h2 class="ptitle">Materi sandi Morse</h2>
+    <div class="grid2">
+      <div class="card"><h3>Aturan dasar</h3>
+        <ul class="list">
+          <li>Titik (<b>.</b>) = 1 satuan, garis (<b>-</b>) = 3 satuan.</li>
+          <li>Jeda antar tanda dalam satu huruf = 1 satuan.</li>
+          <li>Jeda antar huruf = 3 satuan (ditulis spasi).</li>
+          <li>Jeda antar kata = 7 satuan (ditulis <b>/</b>).</li>
+        </ul>
+        <p class="muted small">Contoh: <span class="mono">SOS</span> = <span class="mono">... --- ...</span></p>
+      </div>
+      <div class="card"><h3>Latihan konversi</h3>
+        <div class="field"><label for="pr-text">Teks</label><input id="pr-text" class="mono" autocomplete="off" spellcheck="false" placeholder="mis. HW MUSAGO"></div>
+        <div class="field"><label for="pr-morse">Morse</label><input id="pr-morse" class="mono" autocomplete="off" spellcheck="false" placeholder="mis. .... .--"></div>
+        <div class="row"><button class="btn secondary" id="pr-play" type="button">Dengarkan</button><span class="muted small" id="pr-msg" role="status"></span></div>
+        <p class="muted small">Alat latihan ini tidak tersedia di ruang ujian.</p>
+      </div>
+    </div>
+    <div class="card mt"><h3>Tabel huruf &amp; angka</h3><div id="morse-table" class="mtable"></div></div>
+  </section>
+
+  <!-- 5. Tata tertib -->
+  <section class="page narrow" data-page="tatib" hidden>
+    <h2 class="ptitle">Tata tertib &amp; aktivasi suara</h2>
+    <div class="card">
+      <ul class="list">
+        <li>Kerjakan sendiri. Dilarang bekerja sama atau membuka sumber lain.</li>
+        <li><b>Dilarang berpindah tab/aplikasi atau meminimalkan browser</b> selama ujian. Sistem melaporkannya ke server dan <b>ujian dapat terkunci</b>.</li>
+        <li>Jika terkunci, kamu tidak dapat melanjutkan sampai dibuka oleh penguji/panitia.</li>
+        <li>Waktu dihitung oleh server dan tetap berjalan walau halaman ditutup.</li>
+        <li>Jawaban tersimpan ke server saat kamu mengisi. Tunggu tanda <b>“Tersimpan di server”</b> sebelum mengirim.</li>
+        <li>Gunakan koneksi internet stabil dan baterai cukup.</li>
+      </ul>
+      <div class="notice">Suara peringatan bersifat bantuan saja. Browser dapat membisukan tab yang tersembunyi, sehingga bunyi tidak dijamin terdengar.</div>
+      <div class="row mt"><button class="btn secondary js-sound" type="button">Aktifkan Suara</button><span class="muted small js-sound-msg" role="status"></span></div>
+      <label class="check mt"><input type="checkbox" id="tatib-ok"> Saya sudah membaca dan menyetujui tata tertib.</label>
+      <p class="err" id="tatib-err" role="alert" hidden></p>
+      <button class="btn block mt" id="tatib-start" type="button" disabled>Mulai ujian</button>
+    </div>
+  </section>
+
+  <!-- 6. Ruang ujian -->
+  <section class="page" data-page="ujian" hidden><div id="exam-root"></div></section>
+
+  <!-- 7. Terkunci -->
+  <section class="page narrow" data-page="terkunci" hidden>
+    <div class="card lockcard" id="lock-card">
+      <h2>UJIAN TERKUNCI</h2>
+      <p id="lock-info">Memeriksa status ke server…</p>
+      <p>Kamu <b>tidak dapat melanjutkan</b> sebelum dibuka oleh penguji atau panitia. Hubungi panitia di ruang ujian.</p>
+      <div class="row center"><button class="btn secondary" data-act="refresh-lock" type="button">Segarkan status</button><a class="btn ghost" id="lock-resume" href="#/ujian" hidden>Lanjutkan ujian</a></div>
+    </div>
+  </section>
+
+  <!-- 8. Hasil -->
+  <section class="page narrow" data-page="hasil" hidden><h2 class="ptitle">Hasil ujian</h2><div id="result-root"></div></section>
+
+  <!-- 9. Dashboard penguji -->
+  <section class="page" data-page="penguji" hidden><h2 class="ptitle">Dashboard penguji</h2><div id="examiner-root"></div></section>
+
+  <!-- 10. Form penilaian -->
+  <section class="page narrow" data-page="penilaian" hidden><h2 class="ptitle">Form penilaian praktik</h2><div id="grade-root"></div></section>
+
+  <!-- 11–17. Admin -->
+  <section class="page" data-page="admin" hidden><h2 class="ptitle">Dashboard admin</h2><div class="atabs"></div><div class="body"></div></section>
+  <section class="page" data-page="admin/peserta" hidden><h2 class="ptitle">Manajemen peserta &amp; regu</h2><div class="atabs"></div><div class="body"></div></section>
+  <section class="page" data-page="admin/penguji" hidden><h2 class="ptitle">Akun penguji &amp; admin</h2><div class="atabs"></div><div class="body"></div></section>
+  <section class="page" data-page="admin/soal" hidden><h2 class="ptitle">Manajemen soal</h2><div class="atabs"></div><div class="body"></div></section>
+  <section class="page" data-page="admin/pengaturan" hidden><h2 class="ptitle">Pengaturan ujian &amp; timer</h2><div class="atabs"></div><div class="body"></div></section>
+  <section class="page" data-page="admin/rekap" hidden><h2 class="ptitle">Rekap nilai &amp; ekspor CSV</h2><div class="atabs"></div><div class="body"></div></section>
+  <section class="page" data-page="admin/audit" hidden><h2 class="ptitle">Audit log</h2><div class="atabs"></div><div class="body"></div></section>
+</main>
+
+<footer class="footer">SKT Madya · Hizbul Wathan Qabilah Buya Hamka · SMP Muhammadiyah 1 Gombong</footer>
+
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<dialog id="dlg" aria-labelledby="dlg-title">
+  <form id="dlg-form" method="dialog" novalidate>
+    <h3 id="dlg-title"></h3>
+    <div id="dlg-body"></div>
+    <p class="err" id="dlg-err" role="alert" hidden></p>
+    <div class="row end mt"><button class="btn ghost" id="dlg-cancel" type="button">Batal</button><button class="btn" id="dlg-ok" type="submit">OK</button></div>
+  </form>
+</dialog>
+
+<script type="module" src="script.js"></script>
+<noscript><p class="banner">Aplikasi ini membutuhkan JavaScript.</p></noscript>
+</body>
+</html>
