@@ -1,10 +1,14 @@
-// Konfigurasi web Firebase — nilai ini PUBLIK (bukan rahasia). Keamanan ada di Firestore Rules + Cloud Functions.
-// Isi dari: Firebase Console → Project settings → Your apps → Web app → SDK config.
+
+// Konfigurasi Firebase SKT Madya Sandi Morse HW Musago
 export const firebaseConfig = {
-  apiKey: 'ISI_API_KEY',
-  authDomain: 'ISI_PROJECT_ID.firebaseapp.com',
-  projectId: 'ISI_PROJECT_ID',
-  appId: 'ISI_APP_ID',
+  apiKey: "AIzaSyAVfkxU1HDhOmR_akYDgu_fX24_I6aHweg",
+  authDomain: "sktmadya-sandi-morse-hw-musago.firebaseapp.com",
+  projectId: "sktmadya-sandi-morse-hw-musago",
+  storageBucket: "sktmadya-sandi-morse-hw-musago.firebasestorage.app",
+  messagingSenderId: "807098321609",
+  appId: "1:807098321609:web:42e185acc91572c63e9b18",
+  measurementId: "G-EFT11XFM5V"
 };
-export const FUNCTIONS_REGION = 'asia-southeast2'; // harus sama dengan web/src/lib/api.ts
-export const USE_EMULATORS = false;                // true hanya saat uji lokal di localhost dengan Firebase Emulator
+
+export const FUNCTIONS_REGION = "asia-southeast2";
+export const USE_EMULATORS = false;
